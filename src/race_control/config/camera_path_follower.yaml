@@ -1,0 +1,24 @@
+camera_path_follower:
+  ros__parameters:
+    path_topic: /camera/path
+    metric_status_topic: /camera/metric_path_status
+    drive_topic: /cmd_drive
+    wheel_topic: /cmd_wheel
+    diagnostics_topic: /control/camera_path_follower_diagnostics
+    commanded_speed: 2.0
+    control_rate_hz: 50.0
+    wheelbase_m: 0.73
+    minimum_lookahead_m: 3.0
+    lookahead_gain_s: 0.0
+    maximum_lookahead_m: 3.0
+    maximum_steering_deg: 27.0
+    # /camera/path is REP-103 (+y left); the MCU wheel contract uses
+    # positive steering to the right.
+    lateral_to_right_sign: -1.0
+    steering_sign: 1.0
+    minimum_confidence: 0.45
+    path_timeout_sec: 0.15
+    source_stamp_timeout_sec: 0.15
+    controller_timeout_sec: 0.10
+    steering_rate_limit_deg_s: 100.0
+    saturation_timeout_sec: 0.50

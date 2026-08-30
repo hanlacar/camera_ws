@@ -1,0 +1,15 @@
+cmd_vel_adapter_node:
+  ros__parameters:
+    # This sim car's wheelbase (from turtle_car_urdf.xacro). Used by the
+    # bicycle model to turn a steering angle into a yaw rate.
+    wheelbase_m: 0.77
+    # Speeds (m/s) for each discrete drive stage. The S-curve centerline peaks
+    # at ~18 deg steering for this wheelbase, so keep CRUISE modest.
+    slow_mps: 0.4
+    cruise_mps: 0.9
+    fast_mps: 1.4
+    max_wheel_deg: 27.0
+    # Full stop if a command goes stale (matches the camera stack's own
+    # stop-on-stale philosophy).
+    command_timeout_sec: 0.3
+    publish_rate_hz: 30.0

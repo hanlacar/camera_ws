@@ -1,0 +1,73 @@
+# D456 BASE MOUNT calibration (section 1.A of the ground-plane calibration
+# spec). This file holds ONLY the one-time, physically-measured mounting
+# geometry. It is never overwritten automatically by any node.
+#
+# `configured: false` is the safe default. Until a human operator measures
+# the real vehicle values and sets configured: true, camera_metric_path_node
+# stays in NOT_CONFIGURED and refuses to publish a metric (meters) path --
+# pixel-space /camera/image_path* keeps working normally.
+#
+# HOW TO FILL THIS IN (do it once per physical mounting change):
+#   1. Measure with the vehicle on level ground, camera in its final mount.
+#   2. position_x_m / position_y_m: camera optical center offset from
+#      base_link origin, +x forward, +y left (ROS REP-103 base_link).
+#   3. height_z_m: camera optical center height above the ground plane, in
+#      meters. Must be > 0.
+#   4. reference_roll_deg / reference_pitch_deg use PHYSICAL camera axes:
+#        roll  = left/right tilt about mechanical +X (forward)
+#        pitch = optical-axis up/down tilt about mechanical +Y (left)
+#      Do not copy topic names directly. With the commissioned imu_manager
+#      axis mapping, physical camera pitch is observed on /imu/roll_deg and
+#      physical camera roll is observed on /imu/pitch_deg.
+#   5. reference_yaw_deg: normally 0.0 if the camera is mechanically aligned
+#      with vehicle forward (gravity cannot measure yaw; do not guess).
+#   6. Set configured: true only after filling in real numbers.
+/**:
+  ros__parameters:
+    camera_mount:
+      configured: true
+      # Rear-axle center -> camera optical center in REP-103 base_link.
+      # Commissioned rear-axle-center referenced mount measurements.
+      position_x_m: 0.32
+      position_y_m: 0.0
+      height_z_m: 0.85
+      # Commissioned physical mount angles. Internally the rotation helper
+      # converts degrees with math.radians (-10 deg = -0.1745329252 rad).
+      # Convention: looking down at the ground is a NEGATIVE pitch here --
+      # do not flip the sign.
+      reference_roll_deg: 0.0
+      reference_pitch_deg: -5.0
+      reference_yaw_deg: 0.0
+
+    # Boot-time stationary IMU attitude initialization window (sections 4-5).
+    init_window_sec: 1.0
+    init_min_samples: 15
+    init_max_samples: 400
+    init_max_accel_stddev_mps2: 0.25
+    init_gravity_norm_min_mps2: 8.5
+    init_gravity_norm_max_mps2: 11.0
+    init_max_gyro_norm_rad_s: 0.08
+    init_low_pass_alpha: 0.2
+    init_outlier_mad_k: 3.5
+
+    # Allowed automatic pitch/roll correction range (section 9). Kept small:
+    # only meant to absorb minor mounting drift between runs, not a genuine
+    # re-mount. A genuine re-mount must update reference_pitch/roll above.
+    max_runtime_pitch_correction_deg: 5.0
+    max_runtime_roll_correction_deg: 5.0
+    max_calibration_age_sec: 3600.0
+
+    # Raw D456 motion topics (only used if enable_gyro/enable_accel are
+    # true in d456.yaml; see camera_bringup/config/d456.yaml IMU note).
+    accel_topic: /camera/camera/accel/sample
+    gyro_topic: /camera/camera/gyro/sample
+    camera_info_topic: /camera/camera_info
+    pixel_path_topic: /camera/image_path_typed
+
+    metric_path_frame_id: base_link
+    metric_path_max_range_m: 30.0
+    metric_minimum_points: 3
+    metric_minimum_spacing_m: 0.05
+    metric_maximum_point_jump_m: 4.0
+    metric_maximum_reverse_step_m: 0.25
+    metric_minimum_path_length_m: 1.0

@@ -1,0 +1,104 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <!--
+    Camera + IMU add-on for the turtle_car, sized to match the real vehicle.
+
+    Real vehicle geometry (from camera_mount.yaml):
+      rear-axle center -> camera optical center = 0.31 m forward
+      camera optical center height above ground   = 0.80 m
+
+    This sim model's base_link sits at the VEHICLE CENTER (midpoint of the
+    wheelbase), not the rear axle. The rear axle is at base_link x = -wheel_base/2.
+    So the camera's x in base_link frame is:
+        x = (-wheel_base/2) + 0.31
+    base_link is wheel_radius above the ground, so to place the optical center
+    0.80 m above ground:
+        z = 0.80 - wheel_radius
+
+    These use the same property names the URDF already defines (wheel_base,
+    wheel_radius), so they stay correct if those change.
+  -->
+  <xacro:property name="cam_forward_from_rear_axle" value="0.31"/>
+  <xacro:property name="cam_height_above_ground" value="0.80"/>
+  <xacro:property name="cam_x" value="${-wheel_base/2.0 + cam_forward_from_rear_axle}"/>
+  <xacro:property name="cam_z" value="${cam_height_above_ground - wheel_radius}"/>
+  <!-- Slight downward tilt so the road fills the lower frame. Real vehicle
+       measured about -2.73 deg; here we set a clean, slightly larger downward
+       pitch for a forward-looking driving view. Adjust if the road sits too
+       high or low in the image. Positive pitch in URDF rpy tilts the +x axis
+       DOWN, so a downward look is a small positive pitch. -->
+  <xacro:property name="cam_pitch" value="0.0873"/>  <!-- ~5 deg down -->
+
+  <xacro:property name="cam_box" value="0.03"/>
+  <xacro:property name="cam_mass" value="0.05"/>
+
+  <link name="camera_link">
+    <inertial>
+      <mass value="${cam_mass}"/>
+      <inertia ixx="1e-5" ixy="0" ixz="0" iyy="1e-5" iyz="0" izz="1e-5"/>
+    </inertial>
+    <visual>
+      <geometry><box size="${cam_box} ${cam_box*2} ${cam_box}"/></geometry>
+      <material name="laser_black"/>
+    </visual>
+  </link>
+
+  <joint name="camera_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="camera_link"/>
+    <origin xyz="${cam_x} 0 ${cam_z}" rpy="0 ${cam_pitch} 0"/>
+  </joint>
+
+  <!--
+    Optical frame: REP-103 camera optical convention (z forward, x right,
+    y down) relative to camera_link (x forward, y left, z up). This is the
+    frame the image is expressed in; gz_frame_id points here. A tiny inertial
+    is included so the URDF->SDF converter never has to lump an empty link.
+  -->
+  <link name="camera_optical_link">
+    <inertial>
+      <mass value="0.001"/>
+      <inertia ixx="1e-7" ixy="0" ixz="0" iyy="1e-7" iyz="0" izz="1e-7"/>
+    </inertial>
+  </link>
+  <joint name="camera_optical_joint" type="fixed">
+    <parent link="camera_link"/>
+    <child link="camera_optical_link"/>
+    <origin xyz="0 0 0" rpy="${-pi/2.0} 0 ${-pi/2.0}"/>
+  </joint>
+
+  <!-- Camera sensor: publishes /camera/image_raw + /camera/camera_info. -->
+  <gazebo reference="camera_link">
+    <sensor name="front_camera" type="camera">
+      <topic>/camera/image_raw</topic>
+      <gz_frame_id>camera_optical_link</gz_frame_id>
+      <update_rate>60</update_rate>
+      <always_on>true</always_on>
+      <visualize>false</visualize>
+      <camera>
+        <horizontal_fov>1.204</horizontal_fov>  <!-- ~69 deg, close to D456 color -->
+        <image><width>640</width><height>480</height><format>R8G8B8</format></image>
+        <clip><near>0.05</near><far>25.0</far></clip>
+        <optical_frame_id>camera_optical_link</optical_frame_id>
+        <camera_info_topic>/camera/camera_info</camera_info_topic>
+      </camera>
+    </sensor>
+  </gazebo>
+
+  <!--
+    IMU sensor for the BEV pipeline. camera_metric_path_node expects
+    /camera/camera/accel/sample and /camera/camera/gyro/sample, but a Gazebo
+    IMU publishes a single sensor_msgs/Imu on one topic. We publish that here
+    on /camera/imu; a small bridge/splitter node in this package republishes it
+    as the accel and gyro sample topics the metric node wants. The IMU is
+    rigidly fixed to the camera so its attitude matches the optical frame.
+  -->
+  <gazebo reference="camera_link">
+    <sensor name="camera_imu" type="imu">
+      <topic>/camera/imu</topic>
+      <gz_frame_id>camera_link</gz_frame_id>
+      <update_rate>200</update_rate>
+      <always_on>true</always_on>
+    </sensor>
+  </gazebo>
+</robot>

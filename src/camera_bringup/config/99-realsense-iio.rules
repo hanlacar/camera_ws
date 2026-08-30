@@ -1,0 +1,25 @@
+# D456 Motion Module (BMI085) IIO device permission rule.
+#
+# NOT INSTALLED AUTOMATICALLY. This host's sudo requires an interactive
+# password that this environment could not supply, so this rule has only
+# been staged in-repo, never copied into /etc/udev/rules.d and never
+# reloaded. IMU (/dev/iio:device0, /dev/iio:device1) therefore still shows
+# `crw------- root root` on this host as of this change, and d456.yaml keeps
+# enable_gyro/enable_accel: false.
+#
+# To finish this step, an operator with sudo access must run:
+#
+#   sudo cp camera_bringup/config/99-realsense-iio.rules /etc/udev/rules.d/
+#   sudo udevadm control --reload-rules
+#   sudo udevadm trigger --subsystem-match=iio
+#   ls -la /dev/iio:device*   # expect group "plugdev" (or the group below), rw for group
+#
+# then re-verify with `rs-enumerate-devices` that enabling gyro/accel no
+# longer produces "Permission denied" on scan_elements, and only then flip
+# enable_gyro/enable_accel to true in camera_bringup/config/d456.yaml.
+#
+# The current user is already a member of "plugdev" (confirmed via `groups`),
+# so granting group rw to plugdev is sufficient on this host without adding a
+# new group.
+SUBSYSTEM=="iio", KERNEL=="iio:device*", ATTRS{name}=="*", TAG+="uaccess"
+SUBSYSTEM=="iio", KERNEL=="iio:device*", MODE="0664", GROUP="plugdev"

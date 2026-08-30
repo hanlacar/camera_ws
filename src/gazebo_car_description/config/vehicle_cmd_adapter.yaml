@@ -1,0 +1,16 @@
+vehicle_cmd_adapter:
+  ros__parameters:
+    speed_topic: /cmd/speed_mps
+    steer_topic: /cmd/steer_deg
+    cmd_vel_topic: /cmd_vel
+    mode: ackermann_kinematic
+    publish_rate_hz: 20.0
+    wheel_base: 0.20
+    steering_limit_rad: 0.523599
+    speed_limit_mps: 3.00
+    low_speed_epsilon_mps: 0.05
+    input_timeout_sec: 0.75
+    stale_speed_mps: 0.0
+    stale_steer_deg: 0
+    log_saturation: false
+    debug_log: false

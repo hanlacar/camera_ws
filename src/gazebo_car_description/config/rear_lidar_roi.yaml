@@ -1,0 +1,31 @@
+rear_lidar_roi_node:
+  ros__parameters:
+    lane_detected_topic: /lane/detected
+    lane_mode_topic: /lane/mode
+    lane_lookahead_topic: /lane/lookahead_angle_deg
+    lane_centerline_points_topic: /lane/centerline_valid_points
+    scan_topic: /scan_rear
+    roi_polygon_topic: /rear_lidar/roi_polygon
+    roi_mode_topic: /rear_lidar/roi_mode
+    roi_obstacle_points_topic: /rear_lidar/roi_obstacle_points
+    nearest_obstacle_topic: /rear_lidar/nearest_obstacle
+    severity_topic: /rear_lidar/obstacle_severity
+    roi_frame_id: chassis
+    lane_stale_timeout_sec: 0.5
+    mode_hold_sec: 0.4
+    timer_period_sec: 0.1
+    min_centerline_points: 3
+    rear_corridor_length_m: 1.6
+    corridor_half_width_m: 1.0
+    virtual_opposite_boundary_offset_m: 2.0
+    corridor_curve_lateral_m: 0.75
+    lookahead_full_curve_deg: 25.0
+    corridor_samples: 12
+    sector_fallback_radius_m: 1.0
+    sector_fallback_angle_deg: 120.0
+    sector_fallback_samples: 16
+    front_guard_x_m: 0.05
+    caution_distance_m: 0.7
+    emergency_distance_m: 0.4
+    scan_frame_must_match: true
+    debug_log: false

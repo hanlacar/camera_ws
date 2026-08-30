@@ -1,0 +1,33 @@
+lane_perception:
+  ros__parameters:
+    image_topic: /image_rect
+    output_topic: /lane/debug_image
+    publish_debug_image: true
+    roi_top_ratio: 0.50
+    reference_row_ratio: 0.82
+    lane_half_width_px: 85.0
+    min_main_separation_px: 60
+    gaussian_blur_ksize: 5
+    morphology_kernel_size: 3
+    close_iterations: 1
+    dilate_iterations: 1
+    num_slices: 9
+    window_margin_px: 60
+    min_m00: 50.0
+    max_miss: 2
+    draw_smooth_path: true
+    side_enable: true
+    corridor_margin_in: 4
+    main_guard_px: 25
+    clahe_clip_limit: 2.0
+    clahe_tile_size: 8
+    otsu_min_area: 30
+    otsu_max_area_ratio: 0.35
+    far_hold_frames: 8
+    yellow_min_pixels_bottom: 30
+    yellow_h_low: 15
+    yellow_h_high: 65
+    yellow_s_low: 40
+    yellow_v_low: 60
+    white_v_low: 150
+    white_s_high: 90

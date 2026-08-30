@@ -1,0 +1,13 @@
+rear_lidar_marker_node:
+  ros__parameters:
+    roi_polygon_topic: /rear_lidar/roi_polygon
+    roi_mode_topic: /rear_lidar/roi_mode
+    roi_obstacle_points_topic: /rear_lidar/roi_obstacle_points
+    nearest_obstacle_topic: /rear_lidar/nearest_obstacle
+    severity_topic: /rear_lidar/obstacle_severity
+    marker_topic: /rear_lidar/markers
+    text_height_m: 0.3
+    polygon_line_width_m: 0.05
+    obstacle_point_scale_m: 0.08
+    nearest_point_scale_m: 0.14
+    publish_period_sec: 0.1

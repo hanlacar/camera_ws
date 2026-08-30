@@ -1,0 +1,492 @@
+<?xml version="1.0"?>
+<robot name="m2wr">
+  <link name="chassis">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="2.0"/>
+      <inertia
+        ixx="0.0051000000"
+        ixy="0.0"
+        ixz="0.0"
+        iyy="0.0187500000"
+        iyz="0.0"
+        izz="0.0163500000"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.30 0.11 0.15"/>
+      </geometry>
+      <material name="chassis_red">
+        <color rgba="0.85 0.18 0.18 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.30 0.11 0.15"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <link name="front_left_steer_link">
+    <inertial>
+      <origin xyz="0 0 0.015" rpy="0 0 0"/>
+      <mass value="0.05"/>
+      <inertia
+        ixx="0.0000050000"
+        ixy="0.0"
+        ixz="0.0"
+        iyy="0.0000050000"
+        iyz="0.0"
+        izz="0.0000025000"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0.015" rpy="0 0 0"/>
+      <geometry>
+        <cylinder radius="0.01" length="0.03"/>
+      </geometry>
+      <material name="steer_gray">
+        <color rgba="0.85 0.85 0.85 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0.015" rpy="0 0 0"/>
+      <geometry>
+        <cylinder radius="0.01" length="0.03"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <link name="front_right_steer_link">
+    <inertial>
+      <origin xyz="0 0 0.015" rpy="0 0 0"/>
+      <mass value="0.05"/>
+      <inertia
+        ixx="0.0000050000"
+        ixy="0.0"
+        ixz="0.0"
+        iyy="0.0000050000"
+        iyz="0.0"
+        izz="0.0000025000"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0.015" rpy="0 0 0"/>
+      <geometry>
+        <cylinder radius="0.01" length="0.03"/>
+      </geometry>
+      <material name="steer_gray">
+        <color rgba="0.85 0.85 0.85 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0.015" rpy="0 0 0"/>
+      <geometry>
+        <cylinder radius="0.01" length="0.03"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <link name="front_left_wheel">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0.10"/>
+      <inertia
+        ixx="0.0000258333"
+        ixy="0.0"
+        ixz="0.0"
+        iyy="0.0000450000"
+        iyz="0.0"
+        izz="0.0000258333"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="1.57079632679 0 0"/>
+      <geometry>
+        <cylinder radius="0.03" length="0.02"/>
+      </geometry>
+      <material name="wheel_black">
+        <color rgba="0.08 0.08 0.08 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="1.57079632679 0 0"/>
+      <geometry>
+        <cylinder radius="0.03" length="0.02"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <link name="front_right_wheel">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0.10"/>
+      <inertia
+        ixx="0.0000258333"
+        ixy="0.0"
+        ixz="0.0"
+        iyy="0.0000450000"
+        iyz="0.0"
+        izz="0.0000258333"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="1.57079632679 0 0"/>
+      <geometry>
+        <cylinder radius="0.03" length="0.02"/>
+      </geometry>
+      <material name="wheel_black">
+        <color rgba="0.08 0.08 0.08 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="1.57079632679 0 0"/>
+      <geometry>
+        <cylinder radius="0.03" length="0.02"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <link name="rear_left_wheel">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0.10"/>
+      <inertia
+        ixx="0.0000258333"
+        ixy="0.0"
+        ixz="0.0"
+        iyy="0.0000450000"
+        iyz="0.0"
+        izz="0.0000258333"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="1.57079632679 0 0"/>
+      <geometry>
+        <cylinder radius="0.03" length="0.02"/>
+      </geometry>
+      <material name="wheel_black">
+        <color rgba="0.08 0.08 0.08 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="1.57079632679 0 0"/>
+      <geometry>
+        <cylinder radius="0.03" length="0.02"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <link name="rear_right_wheel">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0.10"/>
+      <inertia
+        ixx="0.0000258333"
+        ixy="0.0"
+        ixz="0.0"
+        iyy="0.0000450000"
+        iyz="0.0"
+        izz="0.0000258333"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="1.57079632679 0 0"/>
+      <geometry>
+        <cylinder radius="0.03" length="0.02"/>
+      </geometry>
+      <material name="wheel_black">
+        <color rgba="0.08 0.08 0.08 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="1.57079632679 0 0"/>
+      <geometry>
+        <cylinder radius="0.03" length="0.02"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <link name="camera_link">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0.01"/>
+      <inertia
+        ixx="0.0000010"
+        ixy="0.0"
+        ixz="0.0"
+        iyy="0.0000010"
+        iyz="0.0"
+        izz="0.0000010"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.001 0.001 0.001"/>
+      </geometry>
+      <material name="camera_blue">
+        <color rgba="0.20 0.35 0.85 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.001 0.001 0.001"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <link name="camera_optical_link"/>
+
+  <!-- Debug-only overhead camera block.
+       Remove this link, joint, and matching gazebo sensor block to delete it.
+       It is intentionally independent from driving sensors and control logic. -->
+  <link name="overhead_debug_camera_link">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0.01"/>
+      <inertia
+        ixx="0.0000010"
+        ixy="0.0"
+        ixz="0.0"
+        iyy="0.0000010"
+        iyz="0.0"
+        izz="0.0000010"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.02 0.02 0.02"/>
+      </geometry>
+      <material name="overhead_camera_green">
+        <color rgba="0.10 0.80 0.35 1.0"/>
+      </material>
+    </visual>
+  </link>
+
+  <link name="front_lidar_link">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0.02"/>
+      <inertia
+        ixx="0.0000010"
+        ixy="0.0"
+        ixz="0.0"
+        iyy="0.0000010"
+        iyz="0.0"
+        izz="0.0000010"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <cylinder radius="0.025" length="0.025"/>
+      </geometry>
+      <material name="lidar_black">
+        <color rgba="0.03 0.03 0.03 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <cylinder radius="0.025" length="0.025"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="front_left_steer_joint" type="revolute">
+    <origin xyz="0.10 0.065 -0.075" rpy="0 0 0"/>
+    <parent link="chassis"/>
+    <child link="front_left_steer_link"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-0.523599" upper="0.523599" effort="25.0" velocity="2.0"/>
+    <dynamics damping="0.2" friction="0.0"/>
+  </joint>
+
+  <joint name="front_right_steer_joint" type="revolute">
+    <origin xyz="0.10 -0.065 -0.075" rpy="0 0 0"/>
+    <parent link="chassis"/>
+    <child link="front_right_steer_link"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-0.523599" upper="0.523599" effort="25.0" velocity="2.0"/>
+    <dynamics damping="0.2" friction="0.0"/>
+  </joint>
+
+  <joint name="front_left_wheel_rolling_joint" type="continuous">
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <parent link="front_left_steer_link"/>
+    <child link="front_left_wheel"/>
+    <axis xyz="0 1 0"/>
+    <dynamics damping="0.02" friction="0.0"/>
+  </joint>
+
+  <joint name="front_right_wheel_rolling_joint" type="continuous">
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <parent link="front_right_steer_link"/>
+    <child link="front_right_wheel"/>
+    <axis xyz="0 1 0"/>
+    <dynamics damping="0.02" friction="0.0"/>
+  </joint>
+
+  <joint name="rear_left_wheel_rolling_joint" type="continuous">
+    <origin xyz="-0.10 0.065 -0.075" rpy="0 0 0"/>
+    <parent link="chassis"/>
+    <child link="rear_left_wheel"/>
+    <axis xyz="0 1 0"/>
+    <dynamics damping="0.02" friction="0.0"/>
+  </joint>
+
+  <joint name="rear_right_wheel_rolling_joint" type="continuous">
+    <origin xyz="-0.10 -0.065 -0.075" rpy="0 0 0"/>
+    <parent link="chassis"/>
+    <child link="rear_right_wheel"/>
+    <axis xyz="0 1 0"/>
+    <dynamics damping="0.02" friction="0.0"/>
+  </joint>
+
+  <joint name="camera_joint" type="fixed">
+    <origin xyz="0.0 0.0 0.225" rpy="0 0 0"/>
+    <parent link="chassis"/>
+    <child link="camera_link"/>
+  </joint>
+
+  <joint name="camera_optical_joint" type="fixed">
+    <origin xyz="0 0 0" rpy="-1.57079632679 0 -1.57079632679"/>
+    <parent link="camera_link"/>
+    <child link="camera_optical_link"/>
+  </joint>
+
+  <!-- Debug-only fixed mount: 1 m above the vehicle center. -->
+  <joint name="overhead_debug_camera_joint" type="fixed">
+    <origin xyz="0.0 0.0 1.0" rpy="0 0 0"/>
+    <parent link="chassis"/>
+    <child link="overhead_debug_camera_link"/>
+  </joint>
+
+  <joint name="front_lidar_joint" type="fixed">
+    <origin xyz="0.13 0 0.16" rpy="0 0 0"/>
+    <parent link="chassis"/>
+    <child link="front_lidar_link"/>
+  </joint>
+
+  <gazebo>
+    <plugin filename="gz-sim-ackermann-steering-system" name="gz::sim::systems::AckermannSteering">
+      <left_joint>front_left_wheel_rolling_joint</left_joint>
+      <left_joint>rear_left_wheel_rolling_joint</left_joint>
+      <right_joint>front_right_wheel_rolling_joint</right_joint>
+      <right_joint>rear_right_wheel_rolling_joint</right_joint>
+      <left_steering_joint>front_left_steer_joint</left_steering_joint>
+      <right_steering_joint>front_right_steer_joint</right_steering_joint>
+      <wheel_base>0.20</wheel_base>
+      <wheel_separation>0.13</wheel_separation>
+      <kingpin_width>0.13</kingpin_width>
+      <wheel_radius>0.03</wheel_radius>
+      <steering_limit>0.523599</steering_limit>
+      <steering_only>false</steering_only>
+      <sub_topic>cmd_vel</sub_topic>
+      <min_velocity>-5.0</min_velocity>
+      <max_velocity>5.0</max_velocity>
+      <min_acceleration>-10.0</min_acceleration>
+      <max_acceleration>10.0</max_acceleration>
+    </plugin>
+  </gazebo>
+
+  <gazebo reference="front_left_wheel">
+    <selfCollide>false</selfCollide>
+    <mu1 value="2.0"/>
+    <mu2 value="2.0"/>
+    <fdir1 value="1 0 0"/>
+  </gazebo>
+
+  <gazebo reference="front_right_wheel">
+    <selfCollide>false</selfCollide>
+    <mu1 value="2.0"/>
+    <mu2 value="2.0"/>
+    <fdir1 value="1 0 0"/>
+  </gazebo>
+
+  <gazebo reference="rear_left_wheel">
+    <selfCollide>false</selfCollide>
+    <mu1 value="2.0"/>
+    <mu2 value="2.0"/>
+    <fdir1 value="1 0 0"/>
+  </gazebo>
+
+  <gazebo reference="rear_right_wheel">
+    <selfCollide>false</selfCollide>
+    <mu1 value="2.0"/>
+    <mu2 value="2.0"/>
+    <fdir1 value="1 0 0"/>
+  </gazebo>
+
+  <gazebo reference="camera_link">
+    <sensor name="front_camera" type="camera">
+      <pose>0 0 0 0 0.20 0</pose>
+      <topic>/image_rect</topic>
+      <gz_frame_id>camera_link</gz_frame_id>
+      <always_on>true</always_on>
+      <update_rate>30</update_rate>
+      <visualize>true</visualize>
+      <camera>
+        <horizontal_fov>1.91986</horizontal_fov>
+        <image>
+          <width>320</width>
+          <height>240</height>
+          <format>R8G8B8</format>
+        </image>
+        <clip>
+          <near>0.05</near>
+          <far>20.0</far>
+        </clip>
+      </camera>
+    </sensor>
+  </gazebo>
+
+  <gazebo reference="overhead_debug_camera_link">
+    <sensor name="overhead_debug_camera" type="camera">
+      <!-- Debug-only downward camera for wheel/line contact inspection.
+           The sensor optical axis is pitched down from the vehicle frame and is
+           not used by any autonomy node. -->
+      <pose>0 0 0 0 1.57079632679 0</pose>
+      <topic>/overhead_debug_camera/image</topic>
+      <gz_frame_id>overhead_debug_camera_link</gz_frame_id>
+      <always_on>true</always_on>
+      <update_rate>15</update_rate>
+      <visualize>true</visualize>
+      <camera>
+        <horizontal_fov>1.57079632679</horizontal_fov>
+        <image>
+          <width>640</width>
+          <height>480</height>
+          <format>R8G8B8</format>
+        </image>
+        <clip>
+          <near>0.05</near>
+          <far>5.0</far>
+        </clip>
+      </camera>
+    </sensor>
+  </gazebo>
+
+  <gazebo reference="front_lidar_link">
+    <sensor name="front_lidar" type="gpu_lidar">
+      <!-- Keep the existing /scan_rear Gazebo topic so both /scan and /scan_rear bridges stay compatible. -->
+      <pose>0 0 0 0 0 0</pose>
+      <topic>scan_rear</topic>
+      <gz_frame_id>front_lidar_link</gz_frame_id>
+      <always_on>true</always_on>
+      <update_rate>10</update_rate>
+      <visualize>true</visualize>
+      <lidar>
+        <scan>
+          <horizontal>
+            <samples>360</samples>
+            <resolution>1</resolution>
+            <min_angle>-2.09439510239</min_angle>
+            <max_angle>2.09439510239</max_angle>
+          </horizontal>
+        </scan>
+        <range>
+          <min>0.08</min>
+          <max>10.0</max>
+          <resolution>0.01</resolution>
+        </range>
+      </lidar>
+    </sensor>
+  </gazebo>
+</robot>

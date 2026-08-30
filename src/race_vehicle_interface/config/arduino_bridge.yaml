@@ -1,0 +1,44 @@
+arduino_serial_bridge_node:
+  ros__parameters:
+    port: /dev/ttyACM0
+    baudrate: 115200
+    encoder_topic: /inpulse
+    rpm_topic: /rpm
+    steering_topic: /steer_angle
+    # The v14 T frame reports accumulated steering drive time, not degrees.
+    steering_position_topic: /steer_position_ms
+    # 2026-08-07 physical wheel alignment: this A0 value is straight ahead.
+    steering_neutral_a0: 371
+    steering_neutral_tolerance_a0: 5
+    steering_a0_topic: /steer_a0
+    steering_a0_error_topic: /steer_a0_error
+    maximum_steering_position_ms: 440.0
+    feedback_timeout_sec: 0.35
+    reconnect_interval_sec: 1.0
+    publish_raw_status: true
+    dtr: true
+    rts: true
+    reset_on_connect: true
+    reset_pulse_sec: 0.1
+    write_timeout_sec: 0.1
+
+    # Keep false until the first command test is performed with wheels lifted.
+    allow_transmit: false
+    steering_only: false
+    cmd_driving_topic: /camera_drive
+    cmd_steer_topic: /camera_wheel
+    command_rate_hz: 20.0
+    command_timeout_sec: 0.3
+    # Existing v14 firmware stops after 2 s without a command. Repeat the
+    # current drive command every 0.5 s to keep it alive with ample margin.
+    firmware_heartbeat_sec: 0.5
+    # ROS stages: -3..3. Firmware mapping: 0->1, +1..3->2..4, -1..-3->6..8.
+    # Locked default. First lifted-wheel test must override this to 1, then arm
+    # explicitly through /arduino_bridge/set_tx_enabled.
+    maximum_abs_stage: 0
+    maximum_steering_deg: 27.0
+    require_fresh_feedback: true
+    # Current v14 returns telemetry on the harmless S status query.
+    legacy_status_poll_hz: 10.0
+    # Allow the Mega bootloader and v21 setup banner to finish before polling.
+    status_poll_start_delay_sec: 2.5

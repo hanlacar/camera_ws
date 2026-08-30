@@ -1,0 +1,35 @@
+# ROS / colcon
+build/
+install/
+log/
+
+# Python and tests
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Editors and OS files
+.vscode/
+.idea/
+.DS_Store
+
+# ROS recordings and runtime logs
+*.bag
+*.db3
+*.mcap
+*.log
+
+# Generated inference artifacts
+*.engine
+*.engine.json
+*.plan
+*.onnx
+*.cache
+
+# Datasets and duplicate archives
+datasets/
+dataset/
+rosbags/
+src/gazebo_sim/worlds.zip

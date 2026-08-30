@@ -1,0 +1,50 @@
+# SIM camera mount for camera_metric_path_node (BEV pipeline).
+#
+# IMPORTANT: this is NOT the real vehicle's camera_mount.yaml. The sim
+# turtle_car's base_link sits at the VEHICLE CENTER (midpoint of the
+# wheelbase), whereas the real vehicle's base_link is at the rear axle. So the
+# camera's base_link-frame offset differs:
+#
+#   real:  position_x_m = 0.31   (rear-axle -> camera)
+#   sim :  position_x_m = -0.075 (vehicle-center -> camera)
+#                        = -wheel_base/2 + 0.31 = -0.385 + 0.31
+#
+# These values MUST match urdf/camera_sensor.xacro exactly. If you change the
+# camera pose in the xacro, update these numbers too.
+/**:
+  ros__parameters:
+    camera_mount:
+      configured: true
+      position_x_m: -0.075
+      position_y_m: 0.0
+      height_z_m: 0.80
+      # Sim camera is mounted with a clean downward pitch. In the xacro the
+      # joint rpy pitch is +0.0873 rad (~5 deg), which points the optical axis
+      # DOWN. In this file's convention (matching the real config, where a
+      # downward look is a negative reference_pitch_deg, e.g. -2.73), a 5 deg
+      # downward look is -5.0 deg.
+      reference_roll_deg: 0.0
+      reference_pitch_deg: -5.0
+      reference_yaw_deg: 0.0
+
+    init_window_sec: 1.0
+    init_min_samples: 15
+    init_max_samples: 400
+    init_max_accel_stddev_mps2: 0.25
+    init_gravity_norm_min_mps2: 8.5
+    init_gravity_norm_max_mps2: 11.0
+    init_max_gyro_norm_rad_s: 0.08
+    init_low_pass_alpha: 0.2
+    init_outlier_mad_k: 3.5
+
+    max_runtime_pitch_correction_deg: 5.0
+    max_runtime_roll_correction_deg: 5.0
+    max_calibration_age_sec: 3600.0
+
+    accel_topic: /camera/camera/accel/sample
+    gyro_topic: /camera/camera/gyro/sample
+    camera_info_topic: /camera/camera_info
+    pixel_path_topic: /camera/image_path_typed
+
+    metric_path_frame_id: base_link
+    metric_path_max_range_m: 30.0

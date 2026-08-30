@@ -1,0 +1,86 @@
+<?xml version="1.0"?>
+<sdf version="1.8">
+  <model name="start_finish_flag_red">
+    <static>true</static>
+    <link name="flag_link">
+      <collision name="pole_collision">
+        <pose>0 0 0.45 0 0 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>0.015</radius>
+            <length>0.90</length>
+          </cylinder>
+        </geometry>
+      </collision>
+
+      <visual name="pole_visual">
+        <pose>0 0 0.45 0 0 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>0.015</radius>
+            <length>0.90</length>
+          </cylinder>
+        </geometry>
+        <material>
+          <ambient>0.25 0.25 0.25 1</ambient>
+          <diffuse>0.35 0.35 0.35 1</diffuse>
+        </material>
+      </visual>
+
+      <visual name="flag_bar_00_visual">
+        <pose>0.135 0 0.80 0 0 0</pose>
+        <geometry><box><size>0.27 0.018 0.035</size></box></geometry>
+        <material>
+          <ambient>0.85 0.05 0.05 1</ambient>
+          <diffuse>0.95 0.08 0.08 1</diffuse>
+          <emissive>0.10 0.00 0.00 1</emissive>
+        </material>
+      </visual>
+      <visual name="flag_bar_01_visual">
+        <pose>0.115 0 0.84 0 0 0</pose>
+        <geometry><box><size>0.23 0.018 0.035</size></box></geometry>
+        <material>
+          <ambient>0.85 0.05 0.05 1</ambient>
+          <diffuse>0.95 0.08 0.08 1</diffuse>
+          <emissive>0.10 0.00 0.00 1</emissive>
+        </material>
+      </visual>
+      <visual name="flag_bar_02_visual">
+        <pose>0.095 0 0.88 0 0 0</pose>
+        <geometry><box><size>0.19 0.018 0.035</size></box></geometry>
+        <material>
+          <ambient>0.85 0.05 0.05 1</ambient>
+          <diffuse>0.95 0.08 0.08 1</diffuse>
+          <emissive>0.10 0.00 0.00 1</emissive>
+        </material>
+      </visual>
+      <visual name="flag_bar_03_visual">
+        <pose>0.075 0 0.92 0 0 0</pose>
+        <geometry><box><size>0.15 0.018 0.035</size></box></geometry>
+        <material>
+          <ambient>0.85 0.05 0.05 1</ambient>
+          <diffuse>0.95 0.08 0.08 1</diffuse>
+          <emissive>0.10 0.00 0.00 1</emissive>
+        </material>
+      </visual>
+      <visual name="flag_bar_04_visual">
+        <pose>0.055 0 0.96 0 0 0</pose>
+        <geometry><box><size>0.11 0.018 0.035</size></box></geometry>
+        <material>
+          <ambient>0.85 0.05 0.05 1</ambient>
+          <diffuse>0.95 0.08 0.08 1</diffuse>
+          <emissive>0.10 0.00 0.00 1</emissive>
+        </material>
+      </visual>
+      <visual name="flag_bar_05_visual">
+        <pose>0.035 0 1.00 0 0 0</pose>
+        <geometry><box><size>0.07 0.018 0.035</size></box></geometry>
+        <material>
+          <ambient>0.85 0.05 0.05 1</ambient>
+          <diffuse>0.95 0.08 0.08 1</diffuse>
+          <emissive>0.10 0.00 0.00 1</emissive>
+        </material>
+      </visual>
+    </link>
+  </model>
+</sdf>

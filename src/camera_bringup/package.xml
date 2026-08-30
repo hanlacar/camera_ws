@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>camera_bringup</name>
+  <version>0.1.0</version>
+  <description>Minimal Intel RealSense D456 RGB bring-up.</description>
+  <maintainer email="ww@todo.todo">ww</maintainer>
+  <license>Apache-2.0</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <exec_depend>ament_index_python</exec_depend>
+  <exec_depend>launch</exec_depend>
+  <exec_depend>launch_ros</exec_depend>
+  <exec_depend>realsense2_camera</exec_depend>
+  <exec_depend>sensor_msgs</exec_depend>
+  <exec_depend>camera_yolo_inference</exec_depend>
+  <exec_depend>camera_navigation</exec_depend>
+  <exec_depend>rqt_image_view</exec_depend>
+
+  <test_depend>ament_cmake_pytest</test_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

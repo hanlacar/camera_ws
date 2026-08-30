@@ -1,0 +1,36 @@
+/camera/camera:
+  ros__parameters:
+    # Leave unset for automatic discovery. A launch serial_no argument selects
+    # one device only when multiple RealSense cameras are connected.
+    enable_color: true
+    rgb_camera.color_profile: "640x480x60"
+    rgb_camera.color_format: "RGB8"
+    rgb_camera.enable_auto_exposure: true
+    color_qos: "SENSOR_DATA"
+    # Color gain remains automatic under auto exposure. Wrapper 4.58.1 has no
+    # separate rgb_camera.enable_auto_gain launch parameter.
+    # Stop-line distance uses only the depth stream aligned into color pixels.
+    # Pointcloud/RGBD/infrared remain disabled to limit USB and CPU load.
+    enable_depth: true
+    depth_module.depth_profile: "640x480x60"
+    depth_module.depth_format: "Z16"
+    enable_infra: false
+    enable_infra1: false
+    enable_infra2: false
+    # Production D456 motion streams. HID/IIO udev access is installed and
+    # standalone hardware validation receives gyro at 200 Hz and accel at
+    # 100 Hz. Keep these enabled for imu_manager and mount calibration.
+    enable_gyro: true
+    gyro_fps: 200
+    gyro_qos: "SENSOR_DATA"
+    enable_accel: true
+    accel_fps: 100
+    accel_qos: "SENSOR_DATA"
+    enable_motion: false
+    unite_imu_method: 0
+    pointcloud.enable: false
+    align_depth.enable: true
+    enable_sync: true
+    enable_rgbd: false
+    publish_tf: false
+    wait_for_device_timeout: 10.0

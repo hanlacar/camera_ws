@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<!--
+  Top-level model: the existing turtle_car plus a forward-looking camera and
+  IMU sized to the real vehicle. The base vehicle and its Gazebo plugins
+  (Ackermann steering on /cmd_vel, front/rear lidar) are untouched; this file
+  only adds the camera_sensor.xacro on top.
+-->
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="turtle_car">
+  <xacro:include filename="turtle_car.urdf.xacro"/>
+  <xacro:include filename="camera_sensor.xacro"/>
+</robot>

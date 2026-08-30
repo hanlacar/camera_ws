@@ -1,0 +1,25 @@
+{
+    "ROS2.distro": "jazzy",
+    "python.autoComplete.extraPaths": [
+        "/home/qor/camera_ws/install/race_control/lib/python3.12/site-packages",
+        "/home/qor/camera_ws/install/race_vehicle_interface/lib/python3.12/site-packages",
+        "/home/qor/camera_ws/install/race_perception/lib/python3.12/site-packages",
+        "/home/qor/camera_ws/install/gazebo_sim/lib/python3.12/site-packages",
+        "/home/qor/camera_ws/install/camera_yolo_inference/lib/python3.12/site-packages",
+        "/home/qor/camera_ws/install/camera_navigation/lib/python3.12/site-packages",
+        "/home/qor/camera_ws/install/race_interfaces/lib/python3.12/site-packages",
+        "/home/qor/camera_ws/install/imu_manager/lib/python3.12/site-packages",
+        "/opt/ros/jazzy/lib/python3.12/site-packages"
+    ],
+    "python.analysis.extraPaths": [
+        "/home/qor/camera_ws/install/race_control/lib/python3.12/site-packages",
+        "/home/qor/camera_ws/install/race_vehicle_interface/lib/python3.12/site-packages",
+        "/home/qor/camera_ws/install/race_perception/lib/python3.12/site-packages",
+        "/home/qor/camera_ws/install/gazebo_sim/lib/python3.12/site-packages",
+        "/home/qor/camera_ws/install/camera_yolo_inference/lib/python3.12/site-packages",
+        "/home/qor/camera_ws/install/camera_navigation/lib/python3.12/site-packages",
+        "/home/qor/camera_ws/install/race_interfaces/lib/python3.12/site-packages",
+        "/home/qor/camera_ws/install/imu_manager/lib/python3.12/site-packages",
+        "/opt/ros/jazzy/lib/python3.12/site-packages"
+    ]
+}

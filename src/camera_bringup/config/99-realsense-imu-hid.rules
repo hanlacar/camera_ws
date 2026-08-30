@@ -1,0 +1,38 @@
+# D456 Motion Module (BMI085) IIO scan_elements/buffer/trigger permission rule.
+# DRAFT ONLY — staged in scratchpad, NOT installed. See camera_bringup/config/
+# 99-realsense-iio.rules (already installed) for the existing device-node-only
+# rule this is meant to supplement, not replace.
+#
+# Problem this rule addresses: every time the D456 Motion Module HID device is
+# opened, the kernel re-probes it under a brand-new HID sysfs instance number
+# (0003:8086:0B5C.NNNN, observed incrementing ~1/sec). The existing installed
+# rule already re-applies GROUP=plugdev/MODE=0664 to the new iio:deviceN device
+# node on every such re-probe (confirmed working). But scan_elements/buffer/
+# trigger are sysfs attribute files under that device, not the device node
+# itself, and udev's OWNER/GROUP/MODE keys only affect the device node udev
+# creates — they do NOT reach arbitrary sysfs attribute files. Those keep
+# root:root default permissions on every new instance, which is the remaining
+# blocker. This rule adds a RUN+= step, scoped tightly to the D456's own
+# accel_3d/gyro_3d IIO leaves, to chgrp/chmod those specific subpaths on add.
+#
+# Matching is done on ATTR{name}=="accel_3d"/"gyro_3d" (stable across re-probe)
+# plus the parent HID-sensor DRIVERS (stable), NOT on the unstable HID
+# instance number, so it keeps matching through every re-probe without
+# needing to be reloaded.
+#
+# NOT INSTALLED. To install (human, interactive sudo required):
+#   sudo cp 99-realsense-imu-hid.rules /etc/udev/rules.d/
+#   sudo udevadm control --reload-rules
+#   sudo udevadm trigger --subsystem-match=iio
+#   (physical USB reconnect or reboot may be needed for the very next Motion
+#    Module re-probe to pick this up — see task note)
+
+SUBSYSTEM=="iio", KERNEL=="iio:device*", ATTR{name}=="accel_3d", DRIVERS=="hid_sensor_accel_3d", GOTO="realsense_imu_iio_match"
+SUBSYSTEM=="iio", KERNEL=="iio:device*", ATTR{name}=="gyro_3d", DRIVERS=="hid_sensor_gyro_3d", GOTO="realsense_imu_iio_match"
+GOTO="realsense_imu_iio_end"
+
+LABEL="realsense_imu_iio_match"
+ACTION=="add|change", MODE="0664", GROUP="plugdev"
+ACTION=="add|change", RUN+="/bin/sh -c 'chgrp -R plugdev /sys%p/scan_elements /sys%p/buffer /sys%p/trigger 2>/dev/null; chmod -R g+w /sys%p/scan_elements /sys%p/buffer /sys%p/trigger 2>/dev/null; true'"
+
+LABEL="realsense_imu_iio_end"
