@@ -38,7 +38,6 @@ TOPICS = {
     "imu_yaw": "/imu/relative_yaw_deg",
     "imu_valid": "/imu/valid",
     "manual_stop": "/manual_stop",
-    "camera_stop": "/camera_stop",
     "estop": "/estop_lock",
     "marker": "/a6_validation/marker",
 }

@@ -19,7 +19,6 @@ topics=(
   /perception/semantic_path_frame
   /camera_drive
   /camera_wheel
-  /camera_stop
   /mcu_drive
   /mcu_wheel
   /mcu/cmd_drive

@@ -34,5 +34,6 @@ setup(
         "camera_mission_perception_node=camera_navigation.camera_mission_perception_node:main",
         "camera_mission_decision_node=camera_navigation.camera_mission_decision_node:main",
         "traffic_light_fusion_node=camera_navigation.traffic_light_fusion_node:main",
+        "camera_command_selector_node=camera_navigation.camera_command_selector_node:main",
     ]},
 )

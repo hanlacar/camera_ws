@@ -3,12 +3,10 @@ import unittest
 
 class RaceVehicleInterfaceImportTest(unittest.TestCase):
 
-    def test_protocol_modules_import(self):
+    def test_mapping_module_imports(self):
         from race_vehicle_interface import command_mapping
-        from race_vehicle_interface import serial_protocol
 
-        self.assertTrue(hasattr(command_mapping, "camera_drive_to_stage"))
-        self.assertTrue(hasattr(serial_protocol, "parse_telemetry"))
+        self.assertTrue(hasattr(command_mapping, "speed_to_stage"))
 
 
 if __name__ == "__main__":

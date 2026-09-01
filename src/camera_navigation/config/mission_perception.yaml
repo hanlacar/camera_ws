@@ -38,10 +38,10 @@ camera_mission_perception_node:
     # imu_manager already publishes startup-level-calibrated base_link pitch.
     # Use that vehicle-frame value directly (nose-up is positive).
     imu_reference_pitch_deg: 0.0
-    # Safe default. The 0.26 m derived estimate (0.58 m wheelbase - 0.32 m
-    # rear-axle-to-camera) is never used unless explicitly commissioned.
+    # Safe default: fallback is disabled and no unverified physical offset is
+    # represented as an exact value. Commission a measured value before use.
     allow_camera_to_front_axle_fallback: false
-    camera_to_front_axle_m: 0.26
+    camera_to_front_axle_m: 0.0
     publish_stop_line_tf: true
     debug_overlay_enabled: false
     publish_rate_hz: 20.0

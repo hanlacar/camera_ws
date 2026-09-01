@@ -30,12 +30,12 @@ class StopLineControlTest(unittest.TestCase):
             0.70: (0.0, True),
             0.50: (0.0, True),
         }
-        for distance, (drive, camera_stop) in expected.items():
+        for distance, (drive, stop_required) in expected.items():
             with self.subTest(distance=distance):
                 decision = self.decision_for_camera_distance(distance)
                 output = apply_stop_line_limit(base, decision)
                 self.assertEqual(output.drive, drive)
-                self.assertEqual(decision.camera_stop, camera_stop)
+                self.assertEqual(decision.stop_required, stop_required)
                 self.assertEqual(output.wheel, base.wheel)
 
     def test_camera_to_front_bumper_offset_is_subtracted(self):
@@ -43,7 +43,7 @@ class StopLineControlTest(unittest.TestCase):
         output = apply_stop_line_limit(
             PixelCommand(2.0, -6, -6.0, "ok", True), decision)
         self.assertAlmostEqual(decision.front_bumper_distance_m, 0.7)
-        self.assertTrue(decision.camera_stop)
+        self.assertTrue(decision.stop_required)
         self.assertEqual(output.drive, 0.0)
         self.assertEqual(output.wheel, -6)
 
@@ -57,11 +57,11 @@ class StopLineControlTest(unittest.TestCase):
         self.assertEqual(policy.confirmation_count, 1)
         policy.ingest_camera_distance(0.69, 1.2)
         policy.ingest_camera_distance(0.69, 1.3)
-        self.assertTrue(policy.decision(1.3).camera_stop)
+        self.assertTrue(policy.decision(1.3).stop_required)
 
         policy.observe_unavailable("mask_missing")
         policy.ingest_camera_distance(3.0, 2.0)
-        self.assertTrue(policy.decision(2.0).camera_stop)
+        self.assertTrue(policy.decision(2.0).stop_required)
         policy.release_stop()
         self.assertEqual(policy.decision(2.0).phase, StopLinePhase.NORMAL)
 
@@ -70,7 +70,7 @@ class StopLineControlTest(unittest.TestCase):
         policy.ingest_camera_distance(0.69, 1.0)
         policy.ingest_camera_distance(0.91, 1.1)
         self.assertEqual(policy.confirmation_count, 0)
-        self.assertFalse(policy.decision(1.1).camera_stop)
+        self.assertFalse(policy.decision(1.1).stop_required)
 
     def test_robust_center_roi_depth_rejects_invalid_and_outliers(self):
         config = StopLineConfig(

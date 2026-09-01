@@ -79,4 +79,8 @@ def generate_launch_description():
                               "go_drive_command"),
                           "degraded_drive_command": LaunchConfiguration(
                               "degraded_drive_command")}]),
+        Node(package="camera_navigation", executable="camera_command_selector_node",
+             name="camera_command_selector_node", output="screen",
+             parameters=[{"candidate_drive_topic": "/camera/candidate/bev/drive",
+                          "candidate_wheel_topic": "/camera/candidate/bev/wheel"}]),
     ])

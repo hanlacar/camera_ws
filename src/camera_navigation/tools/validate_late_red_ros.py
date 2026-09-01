@@ -29,8 +29,10 @@ class LateRedScenario(Node):
             "valid": self.create_publisher(Bool, "/camera/bev/valid", 10),
             "planner": self.create_publisher(String,
                                               "/camera/bev/diagnostics", 10),
-            "drive": self.create_publisher(Float32, "/camera_drive", 10),
-            "wheel": self.create_publisher(Int32, "/camera_wheel", 10),
+            "drive": self.create_publisher(
+                Float32, "/camera/candidate/test/drive", 10),
+            "wheel": self.create_publisher(
+                Int32, "/camera/candidate/test/wheel", 10),
             "encoder": self.create_publisher(Int32, "/mcu/encoder", 10),
             "speed": self.create_publisher(Float32, "/mcu/speed_mps", 10),
             "distance": self.create_publisher(Float32, "/mcu/distance_m", 10),

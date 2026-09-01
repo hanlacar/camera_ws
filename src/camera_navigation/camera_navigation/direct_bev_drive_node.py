@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Thin /camera_drive publisher for the direct BEV stack.
+"""Thin internal drive-candidate producer for the direct BEV stack.
 
 Why this node exists: this codebase's only existing /camera_drive publisher
 is camera_path_controller_node, which is hard-gated on
@@ -22,12 +22,10 @@ direct_bev_planner_node emits state=INVALID via _handle_invalid() whenever
 _calibration_ready() is false -- so no separate calibration check is needed
 here; it is surfaced in the diagnostics topic below for visibility only.
 
-Does not subscribe to, publish, or otherwise touch /camera/bev/wheel or
-/camera_wheel -- bev_wheel_selector_node remains the sole /camera_wheel
-publisher.
+It never owns either final camera command topic.
 
 Publishes on its own fixed-rate timer (drive_rate_hz) regardless of upstream
-message timing, so /camera_drive keeps a steady hz even while stopped: a
+message timing, so the candidate stays at a steady hz even while stopped: a
 gap in publish rate would look identical to a dead node from the outside,
 and "publishing STOP steadily" is a very different failure signature from
 "not publishing at all" during validation.
@@ -102,16 +100,17 @@ class DirectBevDriveNode(Node):
             self.stop_value)
         self.command_sequence = 0
 
-        self.drive_pub = self.create_publisher(Float32, "/camera_drive", 10)
+        self.drive_pub = self.create_publisher(
+            Float32, "/camera/candidate/bev/drive", 10)
         self.diag_pub = self.create_publisher(
             String, "/camera/bev_drive_diagnostics", 10)
         self.create_subscription(String, "/camera/bev/state", self._on_state, 10)
         self.create_timer(1.0 / rate_hz, self._tick)
         self.get_logger().info(
-            f"direct_bev_drive_node ready at {rate_hz:.1f} Hz -> /camera_drive "
+            f"direct_bev_drive_node ready at {rate_hz:.1f} Hz -> candidate drive "
             f"(valid={self.go_value}, degraded={self.degraded_value}, "
             f"stop={self.stop_value}); reads /camera/bev/state "
-            f"only, never touches /camera_wheel")
+            "only; final command ownership remains in the selector")
 
     def _on_state(self, message):
         try:

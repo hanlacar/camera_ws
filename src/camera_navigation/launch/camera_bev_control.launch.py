@@ -5,7 +5,7 @@ Pipeline:
        -> camera_metric_path_node (BEV projection, needs camera_mount.yaml +
           boot-time IMU attitude lock)
        -> camera_path_controller_node (metric Pure Pursuit)
-       -> /camera_drive, /camera_wheel
+       -> internal candidate topics -> camera_command_selector_node
 
 Requires an accurate camera_mount.yaml (height, pitch, forward offset). The
 metric path only publishes while calibration is valid; otherwise the
@@ -44,8 +44,12 @@ def generate_launch_description():
         package="camera_navigation", executable="camera_path_controller_node",
         name="camera_path_controller_node", output="screen",
         parameters=[os.path.join(nav_share, "config", "camera_path_controller.yaml")])
+    selector = Node(
+        package="camera_navigation", executable="camera_command_selector_node",
+        name="camera_command_selector_node", output="screen",
+        parameters=[os.path.join(nav_share, "config", "camera_command_selector.yaml")])
 
     return LaunchDescription([
         LogInfo(msg="BEV camera stack: needs camera_mount.yaml + IMU lock"),
-        camera, imu, yolo, image_path, metric_path, controller,
+        camera, imu, yolo, image_path, metric_path, controller, selector,
     ])

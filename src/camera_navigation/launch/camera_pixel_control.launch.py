@@ -3,7 +3,7 @@
 Pipeline:
   D456 -> YOLO seg -> camera_image_path_node (pixel path)
        -> camera_pixel_controller_node (PD on pixel offset)
-       -> /camera_drive, /camera_wheel
+       -> internal pixel candidate topics
 
 Deliberately does NOT launch camera_metric_path_node and needs NO
 camera_mount.yaml or IMU attitude lock for steering. The existing imu_manager
@@ -47,6 +47,11 @@ def generate_launch_description():
         name="camera_pixel_controller_node", output="screen",
         parameters=[os.path.join(nav_share, "config", "camera_pixel_controller.yaml"),
                     os.path.join(nav_share, "config", "adaptive_non_bev.yaml")])
+    selector = Node(
+        package="camera_navigation", executable="camera_command_selector_node",
+        name="camera_command_selector_node", output="screen",
+        parameters=[{"candidate_drive_topic": "/camera/candidate/pixel/drive",
+                     "candidate_wheel_topic": "/camera/candidate/pixel/wheel"}])
 
     return LaunchDescription([
         DeclareLaunchArgument(
@@ -55,5 +60,5 @@ def generate_launch_description():
             description="Optional D456 serial; empty uses automatic discovery",
         ),
         LogInfo(msg="Pixel camera stack: IMU uphill state enabled; no BEV/extrinsics"),
-        camera, imu, yolo, image_path, controller,
+        camera, imu, yolo, image_path, controller, selector,
     ])

@@ -21,4 +21,14 @@ def generate_launch_description():
             output="screen",
             parameters=[config],
         ),
+        Node(
+            package="camera_navigation",
+            executable="camera_command_selector_node",
+            name="camera_command_selector_node",
+            output="screen",
+            parameters=[{
+                "candidate_drive_topic": "/camera/candidate/pixel/drive",
+                "candidate_wheel_topic": "/camera/candidate/pixel/wheel",
+            }],
+        ),
     ])

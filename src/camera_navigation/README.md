@@ -34,22 +34,23 @@ for comparison and other consumers. Outputs are:
 - `/camera/path_debug_image`
 - `/camera/path_overlay_image` (same-stamp RGB background plus final green path)
 - `/camera/bev/overlay_image` (same-remap RGB BEV plus semantic/path layers)
-- `/camera_drive`, `/camera_wheel`, `/camera_stop` from the pixel controller
+- `/camera/candidate/pixel/drive`, `/camera/candidate/pixel/wheel` from the pixel controller
+- `/camera_drive`, `/camera_wheel` only from `camera_command_selector_node`
 
 The pixel controller pairs the typed `stop_line_rle` with
 `/camera/aligned_depth_to_color/image_raw`. It filters invalid/outlier depth in
 the central ROI, subtracts the configurable camera-to-front-bumper offset, and
 applies a longitudinal ceiling without replacing path steering. A confirmed
-distance at or below 0.7 m latches `/camera_stop=True` until a future behavior
-layer explicitly releases it; missing depth never creates a new stop latch.
+distance at or below 0.7 m latches a zero-drive candidate until a future
+behavior layer explicitly releases it; missing depth never creates a new latch.
 
 The pixel controller also consumes `/imu/slope` and `/imu/valid`. A fresh,
 valid `False -> True` slope edge starts one monotonic-time stop whose default
 duration is `uphill_stop_duration_sec: 5.0`. Valid path steering is preserved
 during that longitudinal veto. After the timer completes, the controller
 drives again even while slope remains true and re-arms only after a valid false
-observation. An invalid IMU cannot create an entry edge, and `/camera_stop`
-continues to represent only the stop-line latch.
+observation. An invalid IMU cannot create an entry edge. Ordinary stops use a
+`0.0` drive candidate; camera_ws does not implement an E-stop topic.
 
 `visualization_only:=true` separates path computation from vehicle ownership:
 GPS can remain the mission/control owner while camera pixel-path calculation
@@ -86,10 +87,10 @@ assume an unmeasured metre-per-pixel conversion.
 
 The production pixel controller reuses each typed `ImagePathPoint.source` and
 the existing `ImagePath.path_state`; branch-suspected paths are marked degraded.
-Confident lane-dominant straight paths may publish `/camera_drive=2.0`, while
+Confident lane-dominant straight paths may produce a drive candidate of `2.0`, while
 valid ROAD_CENTER, sustained single-boundary, temporal-fallback, degraded, or
 lower-confidence paths are capped at `1.0`. Invalid or stale paths still publish
-`/camera_drive=0.0` and `/camera_wheel=0`; steering remains saturated to
+zero drive/wheel candidates; steering remains saturated to
 `[-27, +27]` degrees.
 
 ## Metric reference adapter

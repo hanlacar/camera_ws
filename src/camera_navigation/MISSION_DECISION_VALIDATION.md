@@ -1,7 +1,8 @@
 # Mission decision validation
 
-This layer is advisory only. It publishes `/camera/mission/drive_override*`
-and never publishes `/camera_drive`, `/camera_wheel`, or an MCU topic. The
+The decision node publishes `/camera/mission/drive_override*` and never owns
+`/camera_drive`, `/camera_wheel`, or an MCU topic. In production the single
+`camera_command_selector_node` applies these decisions to the final topics. The
 production planner defaults remain `production`, `none`, `none` for planner,
 line tracking, and road-boundary fallback respectively.
 

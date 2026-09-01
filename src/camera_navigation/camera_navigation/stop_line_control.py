@@ -80,7 +80,7 @@ class StopLineMeasurement:
 class StopLineDecision:
     phase: StopLinePhase
     front_bumper_distance_m: float | None
-    camera_stop: bool
+    stop_required: bool
     reason: str
 
     @property

@@ -51,7 +51,7 @@ class CameraMissionDecisionNode(Node):
             "mode_topic": "/mcu/current_mode",
             "section_topic": "/camera/mission/section",
             "input_timeout_sec": 0.50, "planner_timeout_sec": 0.30,
-            "publish_rate_hz": 20.0, "slope_stop_duration_sec": 3.0,
+            "publish_rate_hz": 20.0, "slope_stop_duration_sec": 4.0,
             "slope_near_crossing_m": 0.25,
             "slope_line_spacing_min_m": 0.40,
             "slope_line_spacing_max_m": 8.0,
@@ -82,6 +82,7 @@ class CameraMissionDecisionNode(Node):
             "exit_signal_min_confidence": 0.60,
             "exit_green_down_confirm_frames": 3.0,
             "exit_signal_timeout_sec": 0.50,
+            "mode_11_exit_signal_enabled": False,
             "debug_overlay_enabled": False,
             "debug_overlay_rate_hz": 5.0,
             "overlay_source_topic": "/camera/mission/debug_overlay",
@@ -93,7 +94,8 @@ class CameraMissionDecisionNode(Node):
             "traffic_aspect_topic": "/camera/traffic_light_fused/aspect",
             "traffic_aspect_confidence_topic": "/camera/traffic_light_fused/confidence",
             "traffic_fusion_diagnostics_topic": "/camera/traffic_light_fused/diagnostics",
-            "wheel_topic": "/camera_wheel",
+            "candidate_drive_topic": "/camera/candidate/path/drive",
+            "candidate_wheel_topic": "/camera/candidate/path/wheel",
             "encoder_timeout_sec": 0.50,
             "speed_timeout_sec": 0.50,
         }
@@ -108,7 +110,7 @@ class CameraMissionDecisionNode(Node):
         self.encoder_timeout = float(self.p("encoder_timeout_sec"))
         self.speed_timeout = float(self.p("speed_timeout_sec"))
         self.values = {
-            "section": "NORMAL", "stop_detected": False,
+            "section": "NORMAL_1", "stop_detected": False,
             "stop_count": 0, "stop_distances": (),
             "traffic": "UNKNOWN", "sign": False, "uphill": False,
             "planner_valid": False, "planner_state": "INVALID",
@@ -167,9 +169,9 @@ class CameraMissionDecisionNode(Node):
                                  lambda m: self._set("planner_valid", m.data), 10)
         self.create_subscription(String, "/camera/bev/diagnostics",
                                  self._planner_diagnostics, 10)
-        self.create_subscription(Float32, "/camera_drive",
+        self.create_subscription(Float32, self.p("candidate_drive_topic"),
                                  lambda m: self._set("planner_drive", m.data), 10)
-        self.create_subscription(Int32, self.p("wheel_topic"),
+        self.create_subscription(Int32, self.p("candidate_wheel_topic"),
                                  lambda m: self._set("wheel_steering", m.data), 10)
         self.create_subscription(Int32, self.p("encoder_topic"),
                                  lambda m: self._set("encoder_count", m.data), 10)
@@ -304,11 +306,11 @@ class CameraMissionDecisionNode(Node):
             return False
         if section == "SLOPE":
             keys = ("stop_distances", "uphill", "mission_diag")
-        elif section == "INTERSECTION":
+        elif section in ("INTERSECTION", "INTERSECTION_4", "INTERSECTION_6"):
             keys = ("stop_distances", "traffic", "mission_diag")
         elif section == "ACCELERATION":
             keys = ("sign", "mission_diag")
-        elif section in ("LEFT_SIGNAL_MONITOR", "EXIT_SIGNAL"):
+        elif section in ("LEFT_SIGNAL_MONITOR", "EXIT_SIGNAL", "NORMAL_11"):
             keys = ()
         else:
             keys = ("mission_diag",)
@@ -398,8 +400,8 @@ class CameraMissionDecisionNode(Node):
     def _reset(self, request, response):
         del request
         _route_mode, section = map_route_section(self.values["section"])
-        section = section or "NORMAL"
-        self.machine.reset(section if section in SECTIONS else "NORMAL")
+        section = section or "NORMAL_1"
+        self.machine.reset(section if section in SECTIONS else "NORMAL_1")
         self.timestamp_rewind = False
         self.source_stamps.clear()
         self.source_stamp = None

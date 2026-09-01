@@ -5,20 +5,20 @@ import math
 
 
 ROUTE_MODE_SECTIONS = {
-    1: "NORMAL", 2: "SLOPE", 3: "NORMAL", 4: "NORMAL",
-    5: "NORMAL", 6: "NORMAL", 7: "NORMAL",
-    8: "LEFT_SIGNAL_MONITOR", 9: "ACCELERATION", 10: "NORMAL",
-    11: "EXIT_SIGNAL",
+    1: "NORMAL_1", 2: "SLOPE", 3: "D_COURSE",
+    4: "INTERSECTION_4", 5: "S_COURSE", 6: "INTERSECTION_6",
+    7: "T_PARK", 8: "NORMAL_8", 9: "ACCELERATION",
+    10: "PARALLEL_PARK", 11: "NORMAL_11",
 }
-SECTIONS = frozenset(("NORMAL", "SLOPE", "INTERSECTION", "ACCELERATION",
-                      "LEFT_SIGNAL_MONITOR", "EXIT_SIGNAL"))
+SECTIONS = frozenset(ROUTE_MODE_SECTIONS.values()) | frozenset((
+    "NORMAL", "INTERSECTION", "LEFT_SIGNAL_MONITOR", "EXIT_SIGNAL"))
 DRIVE_STAGES = frozenset((0.0, 1.0, 2.0, 3.0))
 CONTROL_DRIVE_STAGES = frozenset((-1.0, 0.0, 1.0, 2.0, 3.0))
 
 
 @dataclass(frozen=True)
 class MissionDecisionConfig:
-    slope_stop_duration_sec: float = 3.0
+    slope_stop_duration_sec: float = 4.0
     slope_near_crossing_m: float = 0.25
     slope_line_spacing_min_m: float = 0.40
     slope_line_spacing_max_m: float = 8.0
@@ -54,9 +54,11 @@ class MissionDecisionConfig:
     exit_signal_min_confidence: float = 0.60
     exit_green_down_confirm_frames: float = 3.0
     exit_signal_timeout_sec: float = 0.50
+    mode_11_exit_signal_enabled: bool = False
 
     def validate(self):
-        values = tuple(vars(self).values())
+        values = tuple(value for value in vars(self).values()
+                       if not isinstance(value, bool))
         if not all(math.isfinite(v) and v >= 0.0 for v in values):
             raise ValueError("mission thresholds must be finite and nonnegative")
         if not (self.straight_enter_deg <= self.straight_exit_deg <
@@ -244,16 +246,22 @@ class MissionDecisionMachine:
         self.mission_failure_reason = ""
         if self.section == "SLOPE":
             active, drive = self._slope(inputs)
-        elif self.section == "INTERSECTION":
+        elif self.section in ("INTERSECTION", "INTERSECTION_4",
+                              "INTERSECTION_6"):
             active, drive = self._intersection(inputs)
         elif self.section == "ACCELERATION":
             active, drive = self._acceleration(inputs)
         elif self.section == "LEFT_SIGNAL_MONITOR":
             active, drive = self._left_signal(inputs)
-        elif self.section == "EXIT_SIGNAL":
+        elif self.section == "EXIT_SIGNAL" or (
+                self.section == "NORMAL_11" and
+                self.config.mode_11_exit_signal_enabled):
             active, drive = self._exit_signal(inputs)
+        elif self.section == "NORMAL_11":
+            self.state = f"MODE_11_DIAGNOSTIC_{inputs.traffic_aspect}"
+            active, drive = False, 0.0
         else:
-            self.state = "NORMAL_IDLE"
+            self.state = f"{self.section}_IDLE"
             active, drive = False, 0.0
         mission_requested = active
         requested_drive = drive
@@ -266,7 +274,7 @@ class MissionDecisionMachine:
             result.diagnostics["mission_state_before_safety"] = mission_state
             return result
         effective = requested_drive if mission_requested else inputs.planner_drive
-        if self.section != "NORMAL" and effective < 0.0:
+        if self.section not in ("NORMAL", "NORMAL_1", "NORMAL_8", "NORMAL_11") and effective < 0.0:
             self.state = "SAFE_STOP_REVERSE_FORBIDDEN"
             return self._safe(inputs, "REVERSE_FORBIDDEN", mission_requested,
                               requested_drive)
@@ -335,7 +343,8 @@ class MissionDecisionMachine:
             "distance_m": (float(inputs.distance_m) if
                 math.isfinite(inputs.distance_m) else None),
             "stop_line_distance_m": (self.intersection_distance_m if
-                self.section == "INTERSECTION" and
+                self.section in ("INTERSECTION", "INTERSECTION_4",
+                                 "INTERSECTION_6") and
                 math.isfinite(self.intersection_distance_m) else
                 self._target_distance(distances)),
             "stop_line_tf_valid": bool(inputs.stop_line_tf_valid),
@@ -351,7 +360,9 @@ class MissionDecisionMachine:
             "can_stop_before_line": self.can_stop_before_line,
             "late_red_action": self.late_red_action,
             "intersection_stop_required": (
-                self.section == "INTERSECTION" and bool(active) and drive == 0.0),
+                self.section in ("INTERSECTION", "INTERSECTION_4",
+                                 "INTERSECTION_6") and
+                bool(active) and drive == 0.0),
             "intersection_proceed_permitted": self.intersection_proceed_permitted,
             "intersection_permission_source": self.intersection_permission_source,
             "sign_detected": inputs.sign_detected,
@@ -447,42 +458,35 @@ class MissionDecisionMachine:
                 self.state = "FIRST_LINE_CROSSED"
                 return False, 0.0
 
-        if (inputs.distance_valid and math.isfinite(inputs.distance_m) and
-                self.first_line_odometer_m is not None):
-            self.first_to_second_travel_m = max(
-                0.0, float(inputs.distance_m)-self.first_line_odometer_m)
+        # Nose-up pitch is part of the stop condition, not merely an arming
+        # edge. A later level/downhill sample must never preserve a stop.
+        if not uphill_gate:
+            self.state = "BETWEEN_LINES_WAIT_UPHILL"
+            return False, 0.0
+
+        # The aligned-depth, exact-stamp camera->front_axle measurement is the
+        # primary stop-line distance. Wheel odometry may slip on the ramp and
+        # is therefore never required to identify the second line.
         travel = self.first_to_second_travel_m
         travel_valid = math.isfinite(travel)
         second = min((v for v in distances if v > 0.0), default=None)
-        if second is not None and travel_valid:
-            spacing = travel+second
+        if second is not None and inputs.stop_line_tf_valid:
             decreasing = (self.second_line_previous_detection_m is not None and
                           second < self.second_line_previous_detection_m-1.0e-3)
-            eligible = (travel >= self.config.slope_first_to_second_min_travel_m and
-                        travel <= self.config.slope_first_to_second_max_travel_m and
-                        self.config.slope_line_spacing_min_m <= spacing <=
-                        self.config.slope_line_spacing_max_m and decreasing)
+            eligible = decreasing and self.first_line_crossed
             self.second_line_previous_detection_m = second
             if eligible or self.second_line_tracked:
                 self.second_line_tracked = True
                 self.second_line_distance_m = second
                 self.second_line_last_seen_at = inputs.now
-                self.second_line_last_odometer_m = float(inputs.distance_m)
-                self.line_spacing_m = spacing
+                self.second_line_last_odometer_m = None
                 self.between_lines = True
-        elif (self.second_line_tracked and self.second_line_last_seen_at is not None and
-              inputs.now-self.second_line_last_seen_at <=
-              self.config.slope_second_line_lost_timeout_sec and
-              inputs.distance_valid and math.isfinite(inputs.distance_m) and
-              self.second_line_last_odometer_m is not None):
-            delta = max(0.0, float(inputs.distance_m)-self.second_line_last_odometer_m)
-            self.second_line_distance_m -= delta
-            self.second_line_last_odometer_m = float(inputs.distance_m)
 
         if not self.second_line_tracked:
             self.state = "APPROACH_SECOND_LINE"
             return False, 0.0
-        feedback_valid = (inputs.distance_valid and inputs.speed_valid and
+        feedback_valid = (inputs.stop_line_tf_valid and inputs.imu_valid and
+                          inputs.speed_valid and
                           math.isfinite(inputs.current_speed_mps))
         line_fresh = (self.second_line_last_seen_at is not None and
                       inputs.now-self.second_line_last_seen_at <=
@@ -520,7 +524,7 @@ class MissionDecisionMachine:
             self.hold_started = inputs.now
             self.slope_stop_started = inputs.now
         if inputs.now-self.hold_started < self.config.slope_stop_duration_sec:
-            self.state = "HOLD_3_SECONDS"
+            self.state = "SLOPE_HOLD"
             return True, 0.0
         self.slope_stop_completed = True
         self.state = "SLOPE_COMPLETE"
@@ -632,13 +636,24 @@ class MissionDecisionMachine:
                           "RED_STOPPED")
             return True, 0.0
 
-        if target is None or not inputs.stop_line_tf_valid:
-            self.state = "INTERSECTION_SIGNAL_MONITOR"
-            if proceed_signal:
-                return False, 0.0
-            self.late_red_action = "STOP_FEASIBILITY_UNKNOWN"
-            self.mission_failure_reason = "STOP_FEASIBILITY_UNKNOWN"
+        if target is None:
+            # Traffic lights are advisory unless a stop line is present.
+            self.state = "INTERSECTION_NO_STOP_LINE"
+            return False, 0.0
+        if not inputs.stop_line_tf_valid:
+            self.state = "INTERSECTION_DISTANCE_UNSAFE"
+            self.mission_failure_reason = "STOP_LINE_TF_INVALID"
             return True, 0.0
+        if proceed_signal:
+            self.state = "GREEN_PROCEED"
+            return False, 0.0
+        # With a real stop line ahead, red, unknown, and low-confidence fused
+        # states are all an immediate camera STOP. The selector then makes the
+        # zero command effective; no advisory-only result is possible.
+        self.red_stop_latched = inputs.traffic_light == "R"
+        self.state = ("RED_STOPPED" if inputs.traffic_light == "R" else
+                      "UNKNOWN_SAFE_STOP")
+        return True, 0.0
         if target > self.config.intersection_detection_range_m:
             self.state = "INTERSECTION_APPROACH"
             return False, 0.0
@@ -735,39 +750,18 @@ class MissionDecisionMachine:
 
     def _acceleration(self, inputs):
         if not self.acceleration_armed:
-            self.state = "ACCEL_IDLE"
+            self.state = "WAIT_SIGN"
             if not inputs.sign_detected:
-                return False, 0.0
+                return True, min(2.0, max(0.0, float(inputs.planner_drive)))
             self.acceleration_armed = True
-            self.state = "ACCEL_ARMED"
-            # Straight/turn persistence begins at arming, never from path
-            # samples observed before the required sign+section condition.
-            self.path_shape = "UNKNOWN"
-            self.shape_candidate = None
-            self.shape_since = None
-            self._shape(inputs.required_steering_deg, inputs.now)
-            return False, 0.0
-        shape = self._shape(inputs.required_steering_deg, inputs.now)
-        if self.post_turn_cruise:
-            self.state = "ACCEL_POST_TURN_CRUISE"
-            return True, 2.0
-        if self.turn_detected:
-            if shape == "STRAIGHT":
-                self.post_turn_cruise = True
-                self.state = "ACCEL_POST_TURN_CRUISE"
-                return True, 2.0
-            self.state = "ACCEL_TURN"
-            return True, 1.0
-        if not self.high_speed_completed:
-            if shape == "STRAIGHT":
-                self.high_speed_completed = True
-                self.state = "ACCEL_HIGH_SPEED"
-                return True, 3.0
-            self.state = "ACCEL_WAIT_STRAIGHT"
-            return False, 0.0
-        if shape.startswith("TURN_"):
+        steering = abs(float(inputs.required_steering_deg))
+        if not math.isfinite(steering):
+            self.state = "HIGH_ACCEL_INPUT_INVALID"
+            return True, 0.0
+        if steering > 5.0:
             self.turn_detected = True
-            self.state = "ACCEL_TURN"
-            return True, 1.0
-        self.state = "ACCEL_HIGH_SPEED"
+        if self.turn_detected:
+            self.state = "HIGH_ACCEL_LOCKED_OUT"
+            return True, 2.0
+        self.state = "HIGH_ACCEL_ALLOWED"
         return True, 3.0

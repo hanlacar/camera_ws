@@ -1,9 +1,5 @@
 #!/usr/bin/env python3
-"""Fail-safe Pure Pursuit output for the camera driving command contract.
-
-This node stops at ``/camera_drive`` and ``/camera_wheel``. It never relays a
-command to an MCU and does not publish the legacy continuous target topics.
-"""
+"""Fail-safe Pure Pursuit producer for the internal camera candidate contract."""
 
 from dataclasses import dataclass
 from enum import Enum
@@ -29,8 +25,8 @@ class DriveCommand(float, Enum):
 
 
 ALLOWED_DRIVE_COMMANDS = frozenset(command.value for command in DriveCommand)
-DRIVE_TOPIC = "/camera_drive"
-WHEEL_TOPIC = "/camera_wheel"
+DRIVE_TOPIC = "/camera/candidate/path/drive"
+WHEEL_TOPIC = "/camera/candidate/path/wheel"
 DRIVE_MESSAGE_TYPE = Float32
 WHEEL_MESSAGE_TYPE = Int32
 

@@ -13,7 +13,6 @@ setup(
     data_files=[
         ("share/ament_index/resource_index/packages", ["resource/" + package_name]),
         ("share/" + package_name, ["package.xml"]),
-        ("share/" + package_name, ["ARDUINO_PROTOCOL.md"]),
         (os.path.join("share", package_name, "config"), glob("config/*.yaml")),
         (os.path.join("share", package_name, "launch"), glob("launch/*.launch.py")),
         (
@@ -31,8 +30,6 @@ setup(
         "console_scripts": [
             "vehicle_interface_node = "
             "race_vehicle_interface.vehicle_interface_node:main",
-            "arduino_serial_bridge_node = "
-            "race_vehicle_interface.arduino_serial_bridge_node:main",
             "encoder_serial_bridge_node = "
             "race_vehicle_interface.encoder_serial_bridge_node:main",
             "measured_motion_state_node = "

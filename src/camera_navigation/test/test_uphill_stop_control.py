@@ -76,7 +76,7 @@ class UphillStopControlTest(unittest.TestCase):
         self.policy.update(False, True, 6.1)
         self.assertEqual(self.policy.state, UphillStopState.ARMED)
 
-    def test_j_stop_line_and_uphill_stop_preserve_camera_stop_contract(self):
+    def test_j_stop_line_and_uphill_stop_preserve_stop_contract(self):
         base = PixelCommand(2.0, -8, -8.0, "ok", True)
         stop_line = StopLineDecision(
             StopLinePhase.STOP, 0.5, True, "stop_line_latched")
@@ -85,7 +85,7 @@ class UphillStopControlTest(unittest.TestCase):
         self.assertEqual(output.drive, 0.0)
         self.assertEqual(output.wheel, -8)
         self.assertEqual(output.reason, "stop_line_stop")
-        self.assertTrue(stop_line.camera_stop)
+        self.assertTrue(stop_line.stop_required)
 
         uphill_only = apply_uphill_stop_limit(base, True)
         self.assertEqual(uphill_only.drive, 0.0)
@@ -95,7 +95,7 @@ class UphillStopControlTest(unittest.TestCase):
         self.assertEqual(reverse.drive, 0.0)
         self.assertEqual(reverse.wheel, 3)
         self.assertFalse(StopLineDecision(
-            StopLinePhase.NORMAL, None, False, "clear").camera_stop)
+            StopLinePhase.NORMAL, None, False, "clear").stop_required)
 
     def test_path_fail_safe_remains_highest_priority(self):
         fail_safe = PixelCommand(0.0, 0, 0.0, "path_invalid", False)

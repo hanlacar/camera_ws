@@ -18,7 +18,8 @@ class BevWheelSelector(Node):
         super().__init__("bev_wheel_selector_node")
         self.declare_parameter("active_planner", "none")
         self.active = str(self.get_parameter("active_planner").value)
-        self.wheel_publisher = self.create_publisher(Int32, "/camera_wheel", 10)
+        self.wheel_publisher = self.create_publisher(
+            Int32, "/camera/candidate/bev/wheel", 10)
         self.path_publisher = self.create_publisher(Path, "/camera/path", 10)
         self.create_subscription(Int32, "/camera/bev/wheel", self._on_wheel, 10)
         self.create_subscription(Path, "/camera/bev/path", self._on_path, 10)

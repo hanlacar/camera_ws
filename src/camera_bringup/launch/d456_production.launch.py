@@ -1,13 +1,4 @@
-"""One-command production stack: D456 color bring-up + TensorRT YOLO-Seg
-inference + image-space path generation.
-
-Decision/control (Pure Pursuit, steering, stop-line, traffic-light, traffic20)
-is intentionally NOT included here: that logic is out of scope for this
-launch and is not yet finished. Only real, installed executables are
-referenced (camera bring-up, camera_yolo_inference_node, and
-camera_image_path_node), matching the same /camera/image_raw contract used
-by the test_video-based video_perception_test launch.
-"""
+"""Production D456 stack with one camera command selector."""
 from pathlib import Path
 
 from ament_index_python.packages import get_package_share_directory
@@ -27,12 +18,14 @@ def generate_launch_description():
     camera_share = Path(get_package_share_directory("camera_bringup"))
     yolo_share = Path(get_package_share_directory("camera_yolo_inference"))
     nav_share = Path(get_package_share_directory("camera_navigation"))
+    rgb_share = Path(get_package_share_directory("camera_rgb_traffic_light"))
+    imu_share = Path(get_package_share_directory("imu_manager"))
 
     declarations = [
         DeclareLaunchArgument("launch_camera", default_value="true"),
         DeclareLaunchArgument("launch_path", default_value="true"),
         DeclareLaunchArgument("launch_rqt", default_value="false"),
-        DeclareLaunchArgument("visualization_only_path", default_value="true"),
+        DeclareLaunchArgument("visualization_only_path", default_value="false"),
         DeclareLaunchArgument("serial_no", default_value=""),
         DeclareLaunchArgument("color_fps", default_value="60"),
         DeclareLaunchArgument("device", default_value="cuda:0"),
@@ -66,6 +59,9 @@ def generate_launch_description():
             "perception_overlay_max_fps": LaunchConfiguration("perception_overlay_max_fps"),
         }.items())
 
+    imu = IncludeLaunchDescription(PythonLaunchDescriptionSource(
+        str(imu_share / "launch" / "imu_manager.launch.py")))
+
     path_config = str(nav_share / "config" / "image_path.yaml")
     path_node = Node(
         package="camera_navigation",
@@ -78,6 +74,39 @@ def generate_launch_description():
         }],
         condition=IfCondition(LaunchConfiguration("launch_path")))
 
+    metric_path = Node(
+        package="camera_navigation", executable="camera_metric_path_node",
+        name="camera_metric_path_node", output="screen",
+        parameters=[str(camera_share / "config" / "camera_mount.yaml")])
+    controller = Node(
+        package="camera_navigation", executable="camera_path_controller_node",
+        name="camera_path_controller_node", output="screen",
+        parameters=[str(nav_share / "config" / "camera_path_controller.yaml")])
+    mission_perception = Node(
+        package="camera_navigation", executable="camera_mission_perception_node",
+        name="camera_mission_perception_node", output="screen",
+        parameters=[str(nav_share / "config" / "mission_perception.yaml")])
+    rgb = Node(
+        package="camera_rgb_traffic_light", executable="rgb_traffic_light_node",
+        name="rgb_traffic_light_node", output="screen",
+        parameters=[str(rgb_share / "config" / "rgb_traffic_light.yaml")])
+    fusion = Node(
+        package="camera_navigation", executable="traffic_light_fusion_node",
+        name="traffic_light_fusion_node", output="screen",
+        parameters=[str(nav_share / "config" / "traffic_light_fusion.yaml")])
+    mission_decision = Node(
+        package="camera_navigation", executable="camera_mission_decision_node",
+        name="camera_mission_decision_node", output="screen",
+        parameters=[str(nav_share / "config" / "mission_decision.yaml")])
+    selector = Node(
+        package="camera_navigation", executable="camera_command_selector_node",
+        name="camera_command_selector_node", output="screen",
+        parameters=[str(nav_share / "config" / "camera_command_selector.yaml")])
+    reference_adapter = Node(
+        package="camera_navigation", executable="camera_reference_path_adapter_node",
+        name="camera_reference_path_adapter_node", output="screen",
+        parameters=[str(nav_share / "config" / "camera_reference_path_adapter.yaml")])
+
     rqt = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             str(camera_share / "launch" / "two_view_rqt.launch.py")),
@@ -86,6 +115,9 @@ def generate_launch_description():
     middleware = SetEnvironmentVariable(
         "RMW_IMPLEMENTATION", LaunchConfiguration("rmw_implementation")
     )
+    domain = SetEnvironmentVariable("ROS_DOMAIN_ID", "12")
     return LaunchDescription(
-        declarations + [middleware, camera, inference, path_node, rqt]
+        declarations + [middleware, domain, camera, imu, inference, path_node,
+                        metric_path, controller, mission_perception, rgb, fusion,
+                        mission_decision, selector, reference_adapter, rqt]
     )

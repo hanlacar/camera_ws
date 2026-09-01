@@ -5,7 +5,7 @@ camera_mission_decision_node:
     input_timeout_sec: 0.50
     planner_timeout_sec: 0.30
     publish_rate_hz: 20.0
-    slope_stop_duration_sec: 3.0
+    slope_stop_duration_sec: 4.0
     slope_near_crossing_m: 0.25
     slope_line_spacing_min_m: 0.40
     slope_line_spacing_max_m: 8.0
@@ -41,6 +41,7 @@ camera_mission_decision_node:
     exit_signal_min_confidence: 0.60
     exit_green_down_confirm_frames: 3.0
     exit_signal_timeout_sec: 0.50
+    mode_11_exit_signal_enabled: false
     debug_overlay_enabled: false
     debug_overlay_rate_hz: 5.0
     overlay_source_topic: /camera/mission/debug_overlay
@@ -52,6 +53,7 @@ camera_mission_decision_node:
     traffic_aspect_topic: /camera/traffic_light_fused/aspect
     traffic_aspect_confidence_topic: /camera/traffic_light_fused/confidence
     traffic_fusion_diagnostics_topic: /camera/traffic_light_fused/diagnostics
-    wheel_topic: /camera_wheel
+    candidate_drive_topic: /camera/candidate/path/drive
+    candidate_wheel_topic: /camera/candidate/path/wheel
     encoder_timeout_sec: 0.50
     speed_timeout_sec: 0.50

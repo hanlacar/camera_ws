@@ -5,8 +5,8 @@ Subscribes to the pixel-space path (race_interfaces/ImagePath on
 /camera/image_path_typed) and produces the same discrete vehicle command
 contract as the metric controller:
 
-  /camera_drive  (std_msgs/Float32)  CRUISE=2.0, SLOW=1.0, STOP=0.0
-  /camera_wheel  (std_msgs/Int32)    steering degrees, clamped to +/-27
+  /camera/candidate/pixel/drive  (std_msgs/Float32)
+  /camera/candidate/pixel/wheel  (std_msgs/Int32), clamped to +/-27
 
 Steering is a PD response to the lateral pixel offset of a look-ahead row
 (see pixel_lateral_control). This node needs NO camera extrinsics, NO
@@ -68,9 +68,8 @@ CAMERA_DRIVE_COMMANDS = frozenset((
     DriveCommand.SLOW.value,
     DriveCommand.CRUISE.value,
 ))
-DRIVE_TOPIC = "/camera_drive"
-WHEEL_TOPIC = "/camera_wheel"
-STOP_TOPIC = "/camera_stop"
+DRIVE_TOPIC = "/camera/candidate/pixel/drive"
+WHEEL_TOPIC = "/camera/candidate/pixel/wheel"
 DEFAULT_STEERING_SLOWDOWN_THRESHOLD_DEG = 5.0
 IMU_SLOPE_TOPIC = "/imu/slope"
 IMU_VALID_TOPIC = "/imu/valid"
@@ -172,7 +171,7 @@ def apply_stop_line_limit(command, decision):
 
 
 def apply_uphill_stop_limit(command, stop_active):
-    """Veto valid-path propulsion without changing steering or camera_stop."""
+    """Veto valid-path propulsion without changing steering."""
     if (not command.valid or not stop_active or
             command.drive == DriveCommand.STOP.value):
         return command
@@ -519,7 +518,6 @@ class CameraPixelController(Node):
 
         self.drive_pub = self.create_publisher(Float32, DRIVE_TOPIC, 10)
         self.wheel_pub = self.create_publisher(Int32, WHEEL_TOPIC, 10)
-        self.stop_pub = self.create_publisher(Bool, STOP_TOPIC, 10)
         self.diagnostics_pub = self.create_publisher(
             String, "/camera/pixel_controller_diagnostics", 10)
         self.create_subscription(
@@ -543,7 +541,7 @@ class CameraPixelController(Node):
         self.create_timer(1.0 / rate_hz, self.control)
         self.get_logger().info(
             f"camera PIXEL (non-BEV) controller ready at {rate_hz:.1f} Hz; "
-            f"outputs={DRIVE_TOPIC},{WHEEL_TOPIC},{STOP_TOPIC}; "
+            f"candidate outputs={DRIVE_TOPIC},{WHEEL_TOPIC}; "
             "aligned depth stop-line and one-shot uphill stop enabled")
 
     @staticmethod
@@ -683,7 +681,6 @@ class CameraPixelController(Node):
         state = self.controller.safety_state(command)
         self.drive_pub.publish(Float32(data=float(command.drive)))
         self.wheel_pub.publish(Int32(data=int(command.wheel)))
-        self.stop_pub.publish(Bool(data=bool(stop_decision.camera_stop)))
         self.diagnostics_pub.publish(String(data=json.dumps({
             "valid": command.valid, "reason": command.reason,
             "safety_state": state.value,
@@ -692,7 +689,7 @@ class CameraPixelController(Node):
             "stop_line_phase": stop_decision.phase.value,
             "front_bumper_stop_distance_m":
                 stop_decision.front_bumper_distance_m,
-            "camera_stop": stop_decision.camera_stop,
+            "stop_required": stop_decision.stop_required,
             "stop_latched": self.stop_line_policy.stop_latched,
             "stop_confirmation_count":
                 self.stop_line_policy.confirmation_count,
@@ -721,8 +718,6 @@ class CameraPixelController(Node):
                 PixelController.stop("node_shutdown"), time.monotonic())
             self.drive_pub.publish(Float32(data=DriveCommand.STOP.value))
             self.wheel_pub.publish(Int32(data=0))
-            self.stop_pub.publish(Bool(
-                data=bool(self.stop_line_policy.stop_latched)))
         return super().destroy_node()
 
 

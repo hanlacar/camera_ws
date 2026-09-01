@@ -26,8 +26,10 @@ class ManagerFailsafeProbe(Node):
         self.forwarded_wheel = False
         self.drive_source = None
         self.wheel_source = None
-        self.drive_pub = self.create_publisher(Float32, "/camera_drive", 10)
-        self.wheel_pub = self.create_publisher(Int32, "/camera_wheel", 10)
+        self.drive_pub = self.create_publisher(
+            Float32, "/camera/candidate/test/drive", 10)
+        self.wheel_pub = self.create_publisher(
+            Int32, "/camera/candidate/test/wheel", 10)
         self.create_subscription(Float32, "/mcu/cmd_drive", self._drive, 10)
         self.create_subscription(Int32, "/mcu/cmd_wheel", self._wheel, 10)
         self.create_subscription(String, "/mcu/active_drive_source",

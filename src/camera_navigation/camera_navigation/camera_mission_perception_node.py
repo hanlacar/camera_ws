@@ -93,7 +93,7 @@ class CameraMissionPerceptionNode(Node):
             # camera_mount x=0.32 m from rear axle and commissioned BEV
             # wheelbase=0.58 m imply 0.26 m. Disabled until explicitly
             # commissioned because it does not replace a measured TF chain.
-            "camera_to_front_axle_m": 0.26,
+            "camera_to_front_axle_m": 0.0,
             "publish_stop_line_tf": True,
             "debug_overlay_enabled": False,
             "publish_rate_hz": 20.0,
